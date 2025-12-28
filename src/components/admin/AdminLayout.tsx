@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Users, LogOut, LayoutDashboard, Menu, ListTree, FileText } from "lucide-react";
+import { Users, LogOut, LayoutDashboard, Menu, ListTree, FileText, Trophy } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
@@ -25,15 +25,6 @@ const AdminLayout = () => {
                 Quản trị hệ thống
             </div>
             <nav className="flex-1 space-y-2 p-4">
-                <Link to="/admin">
-                    <Button
-                        variant={isActive("/admin") ? "default" : "ghost"}
-                        className="w-full justify-start"
-                    >
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        Thống kê
-                    </Button>
-                </Link>
                 <Link to="/admin/warriors">
                     <Button
                         variant={isActive("/admin/warriors") ? "default" : "ghost"}
@@ -59,6 +50,15 @@ const AdminLayout = () => {
                     >
                         <FileText className="mr-2 h-4 w-4" />
                         Bài viết
+                    </Button>
+                </Link>
+                <Link to="/admin/quiz-results">
+                    <Button
+                        variant={isActive("/admin/quiz-results") ? "default" : "ghost"}
+                        className="w-full justify-start"
+                    >
+                        <Trophy className="mr-2 h-4 w-4" />
+                        Kết quả cuộc thi
                     </Button>
                 </Link>
             </nav>

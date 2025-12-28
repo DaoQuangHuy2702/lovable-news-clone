@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import News from "./pages/News";
 import Activities from "./pages/Activities";
@@ -19,6 +19,7 @@ import CategoryForm from "@/pages/admin/categories/CategoryForm";
 import ArticleList from "@/pages/admin/articles/ArticleList";
 import ArticleForm from "@/pages/admin/articles/ArticleForm";
 import NewsDetail from "./pages/NewsDetail";
+import QuizResultList from "@/pages/admin/quiz/QuizResultList";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +40,7 @@ const App = () => (
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<div className="text-2xl font-bold">Chào mừng bạn đến với Bảng quản trị</div>} />
+            <Route index element={<Navigate to="/admin/warriors" replace />} />
             <Route path="warriors" element={<WarriorList />} />
             <Route path="warriors/new" element={<WarriorForm />} />
             <Route path="warriors/:id" element={<WarriorForm />} />
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="articles" element={<ArticleList />} />
             <Route path="articles/new" element={<ArticleForm />} />
             <Route path="articles/:id" element={<ArticleForm />} />
+            <Route path="quiz-results" element={<QuizResultList />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

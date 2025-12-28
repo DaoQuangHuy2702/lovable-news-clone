@@ -22,7 +22,7 @@ const AdminLogin = () => {
             const { token } = response.data.data;
             localStorage.setItem("admin_token", token);
             toast.success(response.data.message || "Đăng nhập thành công");
-            navigate("/admin");
+            navigate("/admin/warriors");
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || "Lỗi đăng nhập";
             toast.error(errorMessage);

@@ -6,7 +6,7 @@ const navItems = [
   { label: "Giới thiệu", href: "/" },
   { label: "Tin tức", href: "/news" },
   { label: "Hoạt động", href: "/activities" },
-  { label: "Mini Game", href: "/games" },
+  { label: "Cuộc thi tìm hiểu", href: "/games" },
   { label: "Liên hệ", href: "/contact" },
 ];
 
@@ -35,11 +35,10 @@ const Header = () => {
               <Link
                 key={item.href}
                 to={item.href}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  location.pathname === item.href
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${location.pathname === item.href
                     ? "bg-primary text-card"
                     : "text-foreground hover:text-primary hover:bg-secondary"
-                }`}
+                  }`}
               >
                 {item.label}
               </Link>
@@ -63,11 +62,10 @@ const Header = () => {
                 key={item.href}
                 to={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`block px-4 py-3 text-sm font-medium transition-colors ${
-                  location.pathname === item.href
+                className={`block px-4 py-3 text-sm font-medium transition-colors ${location.pathname === item.href
                     ? "text-primary bg-secondary"
                     : "text-foreground hover:text-primary hover:bg-secondary"
-                }`}
+                  }`}
               >
                 {item.label}
               </Link>
