@@ -34,7 +34,7 @@ const formSchema = z.object({
     title: z.string().min(5, {
         message: "Tiêu đề phải có ít nhất 5 ký tự.",
     }),
-    type: z.enum(["NEWS", "ACTIVITY"], {
+    type: z.enum(["NEWS", "ACTIVITY", "POLITICAL", "LAW", "DOCUMENT"], {
         required_error: "Vui lòng chọn loại bài viết.",
     }),
     excerpt: z.string().optional(),
@@ -129,9 +129,9 @@ const ArticleForm = () => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        // Check file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            toast.error("File quá lớn. Vui lòng chọn file dưới 5MB.");
+        // Check file size (max 100MB)
+        if (file.size > 100 * 1024 * 1024) {
+            toast.error("File quá lớn. Vui lòng chọn file dưới 100MB.");
             return;
         }
 

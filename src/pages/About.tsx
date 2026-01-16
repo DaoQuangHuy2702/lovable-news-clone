@@ -35,7 +35,7 @@ const About = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1579912437766-7896df6d3cd3?w=1920&q=80')`,
+            backgroundImage: `url('/hero-parade.jpg')`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background" />
@@ -98,8 +98,8 @@ const About = () => {
           <div className="grid md:grid-cols-2 gap-8 items-center max-w-5xl mx-auto">
             <div className="rounded-2xl overflow-hidden shadow-elegant">
               <img
-                src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&q=80"
-                alt="Đại hội Đại biểu Đảng bộ Lữ đoàn"
+                src="/dia-ban-dong-quan.jpg"
+                alt="Cán bộ chiến sĩ Lữ đoàn 72 tại địa bàn đóng quân"
                 className="w-full h-64 md:h-80 object-cover"
               />
             </div>

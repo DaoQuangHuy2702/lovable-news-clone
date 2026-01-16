@@ -31,8 +31,19 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
-            <Card className="w-full max-w-md">
+        <div className="relative flex h-screen w-full items-center justify-center overflow-hidden">
+            {/* Background Image */}
+            <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                    backgroundImage: `url('/hero-parade.jpg')`,
+                }}
+            />
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/50" />
+
+            {/* Login Card */}
+            <Card className="relative z-10 w-full max-w-md shadow-2xl">
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-bold">Đăng nhập</CardTitle>
                 </CardHeader>

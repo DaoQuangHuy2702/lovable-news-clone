@@ -144,11 +144,6 @@ const Activities = () => {
           ) : (
             <>
               <ArticleSection
-                title="THÔNG BÁO CHÍNH TRỊ THỜI SỰ"
-                articles={politicalArticles}
-                type="POLITICAL"
-              />
-              <ArticleSection
                 title="TÌM HIỂU VỀ LUẬT"
                 articles={lawArticles}
                 type="LAW"
@@ -157,6 +152,11 @@ const Activities = () => {
                 title="THÔNG TƯ, VĂN BẢN, QUY ĐỊNH"
                 articles={documentArticles}
                 type="DOCUMENT"
+              />
+              <ArticleSection
+                title="THÔNG BÁO CHÍNH TRỊ THỜI SỰ"
+                articles={politicalArticles}
+                type="POLITICAL"
               />
             </>
           )}

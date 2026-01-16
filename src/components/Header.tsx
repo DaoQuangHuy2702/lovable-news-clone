@@ -20,9 +20,11 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center">
-              <span className="text-card font-serif font-bold text-lg">72</span>
-            </div>
+            <img
+              src="/logo-72.jpg"
+              alt="Logo Lữ đoàn 72"
+              className="w-10 h-10 rounded-full object-cover"
+            />
             <div>
               <h1 className="text-lg font-serif font-semibold text-primary">Lữ đoàn 72</h1>
               <p className="text-xs text-muted-foreground">Binh chủng Công binh</p>
