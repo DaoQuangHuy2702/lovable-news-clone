@@ -14,6 +14,9 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import WarriorList from "@/pages/admin/warriors/WarriorList";
 import WarriorForm from "@/pages/admin/warriors/WarriorForm";
 import WarriorDetail from "@/pages/admin/warriors/WarriorDetail";
+import LeaveManagement from "@/pages/admin/warriors/LeaveManagement";
+import LeaveHistory from "@/pages/admin/warriors/LeaveHistory";
+import LeaveRequestForm from "@/pages/admin/warriors/LeaveRequestForm";
 import CategoryList from "@/pages/admin/categories/CategoryList";
 import CategoryForm from "@/pages/admin/categories/CategoryForm";
 import ArticleList from "@/pages/admin/articles/ArticleList";
@@ -45,6 +48,10 @@ const App = () => (
             <Route path="warriors/new" element={<WarriorForm />} />
             <Route path="warriors/:id" element={<WarriorForm />} />
             <Route path="warriors/:id/detail" element={<WarriorDetail />} />
+            <Route path="warriors/leave" element={<LeaveManagement />} />
+            <Route path="warriors/:id/leave" element={<LeaveHistory />} />
+            <Route path="warriors/:id/leave/new" element={<LeaveRequestForm />} />
+            <Route path="leave-requests/:requestId" element={<LeaveRequestForm />} />
 
             <Route path="categories" element={<CategoryList />} />
             <Route path="categories/new" element={<CategoryForm />} />

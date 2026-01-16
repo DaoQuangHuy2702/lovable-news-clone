@@ -34,6 +34,15 @@ const AdminLayout = () => {
                         Quân nhân
                     </Button>
                 </Link>
+                <Link to="/admin/warriors/leave">
+                    <Button
+                        variant={isActive("/admin/warriors/leave") ? "default" : "ghost"}
+                        className="w-full justify-start"
+                    >
+                        <Users className="mr-2 h-4 w-4" />
+                        Quản lý đi phép
+                    </Button>
+                </Link>
                 <Link to="/admin/categories">
                     <Button
                         variant={isActive("/admin/categories") ? "default" : "ghost"}

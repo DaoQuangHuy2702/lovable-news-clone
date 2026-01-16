@@ -38,7 +38,6 @@ const formSchema = z.object({
     unit: z.string().min(1, {
         message: "Vui lòng nhập đơn vị.",
     }),
-    status: z.enum(["active", "inactive"]),
     birthDate: z.string().optional(),
     avatar: z.string().optional(),
     gender: z.string().optional(),
@@ -59,6 +58,7 @@ const formSchema = z.object({
         occupation: z.string().optional(),
         relationship: z.string().min(1, "Vui lòng chọn mối quan hệ"),
     })).optional(),
+    totalLeaveDays: z.preprocess((val) => val === "" ? undefined : Number(val), z.number().optional()),
 });
 
 const WarriorForm = () => {
@@ -78,7 +78,6 @@ const WarriorForm = () => {
             name: "",
             rank: "",
             unit: "",
-            status: "active",
             birthDate: "",
             avatar: "",
             gender: "Nam",
@@ -93,6 +92,7 @@ const WarriorForm = () => {
             currentCommuneCode: "",
             currentAddress: "",
             familyMembers: [],
+            totalLeaveDays: undefined,
         },
     });
 
@@ -388,7 +388,7 @@ const WarriorForm = () => {
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField
                                 control={form.control}
                                 name="rank"
@@ -417,27 +417,6 @@ const WarriorForm = () => {
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="status"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Trạng thái</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Chọn trạng thái" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="active">Đang công tác</SelectItem>
-                                                <SelectItem value="inactive">Đã nghỉ/Chuyển</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -471,6 +450,22 @@ const WarriorForm = () => {
                                                 className="resize-none min-h-[100px]"
                                                 {...field}
                                             />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <FormField
+                                control={form.control}
+                                name="totalLeaveDays"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Tổng số ngày phép</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="Ví dụ: 20" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
