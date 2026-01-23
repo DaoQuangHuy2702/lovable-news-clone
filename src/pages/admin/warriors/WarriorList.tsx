@@ -31,7 +31,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Warrior } from "@/lib/mock-data";
+import { Warrior } from "@/types/warrior";
 import {
     Pagination,
     PaginationContent,
