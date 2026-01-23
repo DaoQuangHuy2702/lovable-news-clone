@@ -8,12 +8,16 @@ const api = axios.create({
     timeout: 300000, // 5 minutes
 });
 
-export const MINIO_URL = 'http://localhost:9000';
-
 export const getMediaUrl = (path: string | null | undefined) => {
     if (!path) return '';
+    // If it's already a full URL (new Cloudinary uploads), return as is
     if (path.startsWith('http')) return path;
-    return `${MINIO_URL}/${path}`;
+
+    // Legacy support for Minio (optional, adjust if you still need it)
+    // const MINIO_URL = 'http://localhost:9000';
+    // return `${MINIO_URL}/${path}`;
+
+    return path;
 };
 
 // Request interceptor
