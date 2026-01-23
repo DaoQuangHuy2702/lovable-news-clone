@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import ReactQuill, { Quill } from 'react-quill';
-import ImageResize from 'quill-image-resize-module-react';
-
-Quill.register('modules/imageResize', ImageResize);
+// Quill registration is handled inside the component to avoid build-time issues with 'window'
 import 'react-quill/dist/quill.snow.css';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,6 +78,26 @@ const ArticleForm = () => {
             thumbnail: "",
         },
     });
+
+    // Register Quill modules only on client side
+    useEffect(() => {
+        const registerQuill = async () => {
+            if (typeof window !== 'undefined') {
+                try {
+                    const { Quill } = await import('react-quill');
+                    const ImageResize = (await import('quill-image-resize-module-react')).default;
+
+                    // Register only if not already registered
+                    if (!Quill.imports['modules/imageResize']) {
+                        Quill.register('modules/imageResize', ImageResize);
+                    }
+                } catch (error) {
+                    console.error("Error registering Quill modules:", error);
+                }
+            }
+        };
+        registerQuill();
+    }, []);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -499,14 +516,22 @@ const ArticleForm = () => {
                                                      height: 300px;
                                                  }
                                              `}</style>
-                                            <ReactQuill
-                                                ref={quillRef}
-                                                theme="snow"
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                className="quill"
-                                                modules={modules}
-                                            />
+                                            <style>{`
+                                                 .quill > .ql-container {
+                                                     height: 300px;
+                                                  }
+                                              `}</style>
+                                            {/* Lazy loading ReactQuill to prevent SSR/Build issues */}
+                                            {typeof window !== 'undefined' && (
+                                                <ReactQuill
+                                                    ref={quillRef}
+                                                    theme="snow"
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    className="quill"
+                                                    modules={modules}
+                                                />
+                                            )}
                                             {/* Hidden inputs for editor media upload */}
                                             <input
                                                 type="file"
