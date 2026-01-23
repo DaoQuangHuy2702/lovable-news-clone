@@ -13,7 +13,6 @@ interface Warrior {
     name: string;
     rank: string;
     unit: string;
-    status: string;
     birthDate?: string;
     gender?: string;
     phoneNumber?: string;
@@ -129,12 +128,6 @@ const WarriorDetail = () => {
                         </div>
                         <div>
                             <CardTitle className="text-2xl">{warrior.name}</CardTitle>
-                        </div>
-                        <div className="ml-auto">
-                            <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${warrior.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                }`}>
-                                {warrior.status === 'active' ? 'Đang công tác' : 'Đã nghỉ/Chuyển'}
-                            </span>
                         </div>
                     </div>
                 </CardHeader>

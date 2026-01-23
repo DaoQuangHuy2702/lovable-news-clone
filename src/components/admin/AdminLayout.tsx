@@ -61,12 +61,21 @@ const AdminLayout = () => {
                         Bài viết
                     </Button>
                 </Link>
+                <Link to="/admin/quizzes">
+                    <Button
+                        variant={isActive("/admin/quizzes") ? "default" : "ghost"}
+                        className="w-full justify-start"
+                    >
+                        <Trophy className="mr-2 h-4 w-4" />
+                        Quản lý bộ câu hỏi
+                    </Button>
+                </Link>
                 <Link to="/admin/quiz-results">
                     <Button
                         variant={isActive("/admin/quiz-results") ? "default" : "ghost"}
                         className="w-full justify-start"
                     >
-                        <Trophy className="mr-2 h-4 w-4" />
+                        <FileText className="mr-2 h-4 w-4" />
                         Kết quả cuộc thi
                     </Button>
                 </Link>

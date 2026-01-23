@@ -331,7 +331,6 @@ const ArticleForm = () => {
                                                     </FormControl>
                                                     <SelectContent>
                                                         <SelectItem value="NEWS">Tin tức</SelectItem>
-                                                        <SelectItem value="ACTIVITY">Hoạt động</SelectItem>
                                                         <SelectItem value="POLITICAL">Thông báo chính trị thời sự</SelectItem>
                                                         <SelectItem value="LAW">Tìm hiểu về luật</SelectItem>
                                                         <SelectItem value="DOCUMENT">Thông tư, văn bản, quy định</SelectItem>

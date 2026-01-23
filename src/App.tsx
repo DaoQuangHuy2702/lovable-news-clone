@@ -22,6 +22,8 @@ import ArticleList from "@/pages/admin/articles/ArticleList";
 import ArticleForm from "@/pages/admin/articles/ArticleForm";
 import NewsDetail from "./pages/NewsDetail";
 import QuizResultList from "@/pages/admin/quiz/QuizResultList";
+import QuizList from "@/pages/admin/quiz/QuizList";
+import QuizForm from "@/pages/admin/quiz/QuizForm";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,9 @@ const App = () => (
           <Route path="articles" element={<ArticleList />} />
           <Route path="articles/new" element={<ArticleForm />} />
           <Route path="articles/:id" element={<ArticleForm />} />
+          <Route path="quizzes" element={<QuizList />} />
+          <Route path="quizzes/new" element={<QuizForm />} />
+          <Route path="quizzes/:id" element={<QuizForm />} />
           <Route path="quiz-results" element={<QuizResultList />} />
         </Route>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { toast } from "sonner";
 import { format, parse, parseISO } from "date-fns";
 import api, { getMediaUrl } from "@/lib/api";
@@ -70,7 +71,9 @@ const WarriorForm = () => {
     const [hometownCommunes, setHometownCommunes] = useState<any[]>([]);
     const [currentCommunes, setCurrentCommunes] = useState<any[]>([]);
     const [isUploading, setIsUploading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -193,7 +196,7 @@ const WarriorForm = () => {
     // Removed useEffects to avoid double-fetching/race conditions with form.reset()
     // Data fetching is now handled in fetchWarrior (initial load) and onValueChange (user interaction)
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -203,17 +206,23 @@ const WarriorForm = () => {
             return;
         }
 
-        // Show local preview
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImagePreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        setSelectedFile(file);
+        if (imagePreview && imagePreview.startsWith("blob:")) {
+            URL.revokeObjectURL(imagePreview);
+        }
+        setImagePreview(URL.createObjectURL(file));
+
+        // Clear input value to allow selecting same file again
+        if (e.target) e.target.value = "";
+    };
+
+    const handleConfirmUpload = async () => {
+        if (!selectedFile) return;
 
         setIsUploading(true);
         try {
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", selectedFile);
 
             const response = await api.post("/cms/upload", formData, {
                 headers: {
@@ -226,20 +235,43 @@ const WarriorForm = () => {
                 form.setValue("avatar", imageUrl);
                 setImagePreview(getMediaUrl(imageUrl));
                 toast.success("Upload ảnh thành công!");
+                setSelectedFile(null);
             }
         } catch (error) {
             console.error("Upload failed:", error);
             toast.error("Không thể upload ảnh");
-            setImagePreview(null);
+            setSelectedFile(null);
+            setImagePreview(form.getValues("avatar") ? getMediaUrl(form.getValues("avatar")) : null);
         } finally {
             setIsUploading(false);
         }
     };
 
+    const handleCancelSelection = () => {
+        setSelectedFile(null);
+        if (imagePreview && imagePreview.startsWith("blob:")) {
+            URL.revokeObjectURL(imagePreview);
+        }
+        setImagePreview(form.getValues("avatar") ? getMediaUrl(form.getValues("avatar")) : null);
+    };
+
     const removeImage = () => {
+        setSelectedFile(null);
+        if (imagePreview && imagePreview.startsWith("blob:")) {
+            URL.revokeObjectURL(imagePreview);
+        }
         setImagePreview(null);
         form.setValue("avatar", "");
     };
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (imagePreview && imagePreview.startsWith("blob:")) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
@@ -283,33 +315,82 @@ const WarriorForm = () => {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <div className="flex flex-col items-center space-y-4 pb-4 border-b">
                             <FormLabel className="text-base font-semibold">Ảnh đại diện</FormLabel>
-                            <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-                                {imagePreview ? (
-                                    <>
-                                        <img src={imagePreview} alt="Avatar preview" className="w-full h-full object-cover" />
-                                        <button
-                                            type="button"
-                                            onClick={removeImage}
-                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                            <div className="relative group">
+                                <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                                    {imagePreview ? (
+                                        <>
+                                            <img src={imagePreview} alt="Avatar preview" className="w-full h-full object-cover" />
+                                            {selectedFile && (
+                                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                                    <span className="text-[10px] text-white font-medium bg-black/60 px-2 py-1 rounded text-center">Chờ xác nhận</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div
+                                            className="text-center p-2 cursor-pointer w-full h-full flex flex-col items-center justify-center"
+                                            onClick={() => fileInputRef.current?.click()}
                                         >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className="text-center p-2">
-                                        <Upload className="w-8 h-8 mx-auto text-gray-400" />
-                                        <span className="text-xs text-gray-400">Tải ảnh lên</span>
-                                    </div>
+                                            <Upload className="w-8 h-8 mx-auto text-gray-400" />
+                                            <span className="text-xs text-gray-400">Tải ảnh lên</span>
+                                        </div>
+                                    )}
+                                </div>
+                                {imagePreview && !selectedFile && (
+                                    <button
+                                        type="button"
+                                        onClick={removeImage}
+                                        className="absolute -top-2 -right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all shadow-md z-10"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 )}
                                 <input
                                     type="file"
+                                    ref={fileInputRef}
                                     accept="image/*"
-                                    onChange={handleImageUpload}
-                                    className="absolute inset-0 opacity-0 cursor-pointer"
-                                    disabled={isUploading}
+                                    onChange={handleFileSelect}
+                                    className="hidden"
                                 />
                             </div>
-                            {isUploading && <p className="text-xs text-blue-500 animate-pulse">Đang tải lên...</p>}
+
+                            {selectedFile ? (
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="default"
+                                        size="sm"
+                                        onClick={handleConfirmUpload}
+                                        disabled={isUploading}
+                                        className="bg-green-600 hover:bg-green-700 h-8 text-xs"
+                                    >
+                                        {isUploading ? "Đang tải..." : "Xác nhận"}
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleCancelSelection}
+                                        disabled={isUploading}
+                                        className="h-8 text-xs"
+                                    >
+                                        Huỷ
+                                    </Button>
+                                </div>
+                            ) : (
+                                !imagePreview && (
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="h-8 text-xs"
+                                    >
+                                        <Upload className="h-3 w-3 mr-1" /> Chọn ảnh
+                                    </Button>
+                                )
+                            )}
+
                             <p className="text-[10px] text-muted-foreground text-center">
                                 Hỗ trợ: JPG, PNG, GIF (Tối đa 5MB)
                             </p>
@@ -502,27 +583,17 @@ const WarriorForm = () => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Tỉnh/Thành phố</FormLabel>
-                                            <Select
+                                            <SearchableSelect
+                                                options={provinces.map(p => ({ value: p.code, label: p.name }))}
                                                 onValueChange={(value) => {
                                                     field.onChange(value);
                                                     fetchHometownCommunes(value);
-                                                    form.setValue("hometownCommuneCode", ""); // Reset commune when province changes
+                                                    form.setValue("hometownCommuneCode", "");
                                                 }}
                                                 value={field.value}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Chọn Tỉnh/Thành phố" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {provinces.map((province) => (
-                                                        <SelectItem key={province.code} value={province.code}>
-                                                            {province.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                                placeholder="Chọn Tỉnh/Thành phố"
+                                                searchPlaceholder="Tìm kiếm tỉnh..."
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -534,20 +605,14 @@ const WarriorForm = () => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Xã/Phường/Thị trấn</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value} disabled={!hometownProvinceCode}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Chọn Xã/Phường/Thị trấn" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {hometownCommunes.map((commune) => (
-                                                        <SelectItem key={commune.id} value={commune.id}>
-                                                            {commune.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            <SearchableSelect
+                                                options={hometownCommunes.map(c => ({ value: c.id, label: c.name }))}
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                                disabled={!hometownProvinceCode}
+                                                placeholder="Chọn Xã/Phường/Thị trấn"
+                                                searchPlaceholder="Tìm kiếm xã..."
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -577,27 +642,17 @@ const WarriorForm = () => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Tỉnh/Thành phố</FormLabel>
-                                            <Select
+                                            <SearchableSelect
+                                                options={provinces.map(p => ({ value: p.code, label: p.name }))}
                                                 onValueChange={(value) => {
                                                     field.onChange(value);
                                                     fetchCurrentCommunes(value);
-                                                    form.setValue("currentCommuneCode", ""); // Reset commune when province changes
+                                                    form.setValue("currentCommuneCode", "");
                                                 }}
                                                 value={field.value}
-                                            >
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Chọn Tỉnh/Thành phố" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {provinces.map((province) => (
-                                                        <SelectItem key={province.code} value={province.code}>
-                                                            {province.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                                placeholder="Chọn Tỉnh/Thành phố"
+                                                searchPlaceholder="Tìm kiếm tỉnh..."
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -609,20 +664,14 @@ const WarriorForm = () => {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Xã/Phường/Thị trấn</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value} disabled={!currentProvinceCode}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Chọn Xã/Phường/Thị trấn" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {currentCommunes.map((commune) => (
-                                                        <SelectItem key={commune.id} value={commune.id}>
-                                                            {commune.name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            <SearchableSelect
+                                                options={currentCommunes.map(c => ({ value: c.id, label: c.name }))}
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                                disabled={!currentProvinceCode}
+                                                placeholder="Chọn Xã/Phường/Thị trấn"
+                                                searchPlaceholder="Tìm kiếm xã..."
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}

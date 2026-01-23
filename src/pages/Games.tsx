@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trophy, RotateCcw, CheckCircle, XCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -24,160 +24,10 @@ import {
 import { toast } from "sonner";
 import api from "@/lib/api";
 
-const quizQuestions = [
-  {
-    question: "Ngày truyền thống của Binh chủng Công binh là ngày nào?",
-    options: ["25/12/1944", "25/03/1946", "22/12/1944", "19/05/1945"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Tổ chức tiền thân của Binh chủng Công binh là gì?",
-    options: ["Cục Quân giới", "Công chính Giao thông Cục", "Cục Tác chiến", "Cục Vận tải"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Khẩu hiệu truyền thống vẻ vang của Binh chủng Công binh là gì?",
-    options: ["Quyết chiến - Quyết thắng", "Thần tốc - Táo bạo", "Mở đường thắng lợi", "Trung thành - Dũng cảm"],
-    correctAnswer: 2,
-  },
-  {
-    question: "Bác Hồ ví lực lượng Công binh với bộ phận nào của cây mác trong thư gửi cán bộ chiến sĩ?",
-    options: ["Mũi mác", "Lưỡi mác", "Cán mác", "Vỏ mác"],
-    correctAnswer: 2,
-  },
-  {
-    question: "Ai là Tư lệnh đầu tiên của Binh chủng Công binh?",
-    options: ["Phạm Hoàng", "Trần Đại Nghĩa", "Võ Nguyên Giáp", "Hoàng Văn Thái"],
-    correctAnswer: 0,
-  },
-  {
-    question: "Kỳ tích nào được thực hiện tại Đồi A1 trong chiến dịch Điện Biên Phủ bởi bộ đội Công binh?",
-    options: ["Bắc cầu qua sông Nậm Rốm", "Kích nổ khối bộc phá gần 1000kg", "Đào hào bao vây sân bay Mường Thanh", "Rà phá hết bãi mìn của Pháp"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Binh chủng Công binh đón nhận danh hiệu Anh hùng LLVTND lần thứ nhất vào năm nào?",
-    options: ["1975", "1976", "1980", "1985"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Công trình trên biển nào là biểu tượng ý chí kiên cường của bộ đội Công binh?",
-    options: ["Cảng Cam Ranh", "Đường Hồ Chí Minh trên biển", "Hệ thống Nhà giàn DK1", "Đèn hải đăng Trường Sa"],
-    correctAnswer: 2,
-  },
-  {
-    question: "BOMICEN là tên viết tắt của cơ quan nào trực thuộc Binh chủng?",
-    options: ["Trung tâm Công nghệ xử lý Bom mìn", "Viện Kỹ thuật Công binh", "Trường Sĩ quan Công binh", "Trung tâm Thông tin Công binh"],
-    correctAnswer: 0,
-  },
-  {
-    question: "Năm đầu tiên Binh chủng cử Đội Công binh tham gia Gìn giữ hòa bình Liên Hợp Quốc là năm nào?",
-    options: ["2020", "2021", "2022", "2023"],
-    correctAnswer: 2,
-  },
-  {
-    question: "Khu vực nào là nơi đóng quân của Đội Công binh Việt Nam tại phái bộ UNISFA?",
-    options: ["Nam Sudan", "Trung Phi", "Khu vực Abyei", "Mali"],
-    correctAnswer: 2,
-  },
-  {
-    question: "Sự kiện cứu hộ quốc tế quy mô lớn nào Công binh tham gia vào đầu năm 2023?",
-    options: ["Lũ lụt ở Libya", "Động đất tại Thổ Nhĩ Kỳ", "Cháy rừng ở Hy Lạp", "Sóng thần ở Indonesia"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Đơn vị nào trực tiếp bắc cầu phao xử lý sự cố cầu Phong Châu (Phú Thọ) năm 2024?",
-    options: ["Lữ đoàn 72", "Lữ đoàn 249", "Lữ đoàn 239", "Lữ đoàn 270"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Vũ khí đặc biệt nào do Công binh chế tạo để vô hiệu hóa bom từ trường của Mỹ?",
-    options: ["Máy dò mìn cầm tay", "Nam châm vĩnh cửu", "Khung dây nam châm rà phá từ tính", "Xe thiết bị quét mìn"],
-    correctAnswer: 2,
-  },
-  {
-    question: "Tuyến đường nào được mệnh danh là 'Trận đồ bát quái' xuyên rừng già do Công binh mở?",
-    options: ["Đường 9 Nam Lào", "Đường Hồ Chí Minh (Đường Trường Sơn)", "Đường 1A", "Đường 5"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Đến năm 2026, Binh chủng Công binh sẽ kỷ niệm bao nhiêu năm ngày truyền thống?",
-    options: ["75 năm", "80 năm", "85 năm", "90 năm"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Huân chương cao quý nhất mà Binh chủng Công binh từng được nhận là gì?",
-    options: ["Huân chương Độc lập", "Huân chương Quân công", "Huân chương Sao Vàng", "Huân chương Hồ Chí Minh"],
-    correctAnswer: 2,
-  },
-  {
-    question: "Đơn vị nào dự kiến đón nhận danh hiệu Anh hùng LLVTND vào tháng 12/2025?",
-    options: ["Lữ đoàn 72", "Lữ đoàn 249", "Tiểu đoàn 1", "Trường Sĩ quan Công binh"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Câu nói nào đúc kết phương thức hoạt động đầy hy sinh của bộ đội Công binh?",
-    options: ["Đi trước mở đường", "Về sau thắng lợi", "Đi trước về sau", "Cả 3 phương án trên"],
-    correctAnswer: 2,
-  },
-  {
-    question: "Phương tiện bảo đảm cơ động chủ yếu giúp đại quân tiến vào Sài Gòn xuân 1975 là gì?",
-    options: ["Thuyền nan", "Máy bay", "Cơ sở vật chất tại chỗ", "Cơ giới và cầu phao dã chiến"],
-    correctAnswer: 3,
-  },
-  {
-    question: "Kết quả xử lý cung đường 'Highway to Hell' tại Abyei của Đội Công binh Việt Nam?",
-    options: ["Để nguyên trạng", "Biến thành con đường cấp phối phẳng lì", "Làm cầu treo", "Xây dựng đường bê tông"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Tên gọi thân mật biểu hiện sự nguy hiểm của người lính rà phá bom mìn là gì?",
-    options: ["Người đi tìm cái chết", "Chiến đấu với tử thần giấu mặt", "Thợ săn bom mìn", "Người lính im lặng"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Cuộc giải cứu 'phép màu' nào năm 2014 có sự đóng góp then chốt của Công binh?",
-    options: ["Giải cứu thợ mỏ Chile", "Hầm thủy điện Đạ Dâng", "Sập cầu Cần Thơ", "Hang Tham Luang"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Khí tài đặc chủng nào giúp Công binh bảo đảm vượt sông nhanh chóng cho xe tăng?",
-    options: ["Xuồng máy", "Cầu phao PMP", "Phà gỗ", "Cầu treo"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Nhiệm vụ 'xây dựng công trình chiến đấu' của Công binh bao gồm những gì?",
-    options: ["Xây nhà văn hóa", "Xây dựng hầm hào, công sự, SHC ngầm", "Làm đường quốc lộ", "Xây dựng trường học"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Lực lượng nòng cốt tham gia Trung tâm hành động bom mìn quốc gia (VNMAC) là ai?",
-    options: ["Cảnh sát PCCC", "Bộ đội Công binh", "Dân quân tự vệ", "Thanh niên xung phong"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Hình ảnh 'người lính cởi trần, khoét núi' gắn liền với giai đoạn nào?",
-    options: ["Kháng chiến chống Pháp và Mỹ", "Thời kỳ bao cấp", "Thời kỳ đổi mới", "Năm 2024"],
-    correctAnswer: 0,
-  },
-  {
-    question: "Công trình dân sinh lớn nào có sự đóng góp xây dựng quan trọng của Công binh?",
-    options: ["Landmark 81", "Thủy điện Hòa Bình và Đường dây 500kV", "Cầu Bãi Cháy", "Sân bay Phú Quốc"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Khen thưởng cao nhất cho cá nhân/tập thể công binh có thành tích đặc biệt là gì?",
-    options: ["Bằng khen của Bộ", "Danh hiệu Anh hùng Lực lượng vũ trang nhân dân", "Chiến sĩ thi đua", "Huân chương Lao động"],
-    correctAnswer: 1,
-  },
-  {
-    question: "Tổng số lần Binh chủng Công binh đã vinh dự nhận danh hiệu Anh hùng LLVTND?",
-    options: ["1 lần", "2 lần", "3 lần", "4 lần"],
-    correctAnswer: 1,
-  },
-];
-
 const Games = () => {
+  const [quiz, setQuiz] = useState<any>(null);
+  const [quizQuestions, setQuizQuestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -197,6 +47,30 @@ const Games = () => {
     unit: "",
     phoneNumber: "",
   });
+
+  const fetchActiveQuiz = async () => {
+    try {
+      const response = await api.get("/quiz/active");
+      if (response.data && response.data.data) {
+        setQuiz(response.data.data);
+        const questions = response.data.data.questions.map((q: any) => ({
+          question: q.content,
+          options: q.options.map((o: any) => o.content),
+          correctAnswer: q.options.findIndex((o: any) => o.isCorrect),
+        }));
+        setQuizQuestions(questions);
+      }
+    } catch (error) {
+      console.error("Failed to fetch active quiz:", error);
+      // We don't toast error here because it might just mean no active quiz
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchActiveQuiz();
+  }, []);
 
   const handleStartGame = () => {
     setTimeStarted(Date.now());
@@ -234,10 +108,11 @@ const Games = () => {
     setIsSubmitting(true);
     try {
       const completionTime = timeStarted ? Math.floor((Date.now() - timeStarted) / 1000) : 0;
-      const response = await api.post("/quiz/submit", {
+      await api.post("/quiz/submit", {
         ...formData,
         score,
         completionTime,
+        quiz: { id: quiz.id }
       });
       toast.success("Nộp kết quả thành công!");
       setShowSubmission(false);
@@ -252,7 +127,8 @@ const Games = () => {
 
   const handleFetchLeaderboard = async () => {
     try {
-      const response = await api.get("/quiz/leaderboard");
+      const url = quiz?.id ? `/quiz/leaderboard?quizId=${quiz.id}` : "/quiz/leaderboard";
+      const response = await api.get(url);
       if (response.data && response.data.data) {
         setLeaderboardData(response.data.data);
         setShowLeaderboard(true);
@@ -295,27 +171,36 @@ const Games = () => {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-4 uppercase leading-tight">
-            CUỘC THI TÌM HIỂU 80 NĂM THÀNH LẬP BINH CHỦNG CÔNG BINH <br className="hidden md:block" /> (25/3/1946 - 25/3/2026)
+            {quiz ? quiz.title : "CUỘC THI TÌM HIỂU TRUYỀN THỐNG"}
           </h1>
           <div className="w-20 h-1 bg-primary mx-auto rounded-full mb-6" />
           <p className="text-muted-foreground mb-6">
-            Hãy cùng ôn lại truyền thống vẻ vang "Mở đường thắng lợi" của bộ đội Công binh
+            {quiz ? quiz.description : "Hiện tại chưa có cuộc thi nào đang diễn ra. Vui lòng quay lại sau."}
           </p>
-          <Button
-            onClick={handleFetchLeaderboard}
-            variant="outline"
-            className="gap-2 border-primary text-primary hover:bg-primary/10 rounded-full"
-          >
-            <Trophy className="w-4 h-4" />
-            Xem bảng xếp hạng
-          </Button>
+          {quiz && (
+            <Button
+              onClick={handleFetchLeaderboard}
+              variant="outline"
+              className="gap-2 border-primary text-primary hover:bg-primary/10 rounded-full"
+            >
+              <Trophy className="w-4 h-4" />
+              Xem bảng xếp hạng
+            </Button>
+          )}
         </div>
       </section>
 
       {/* Quiz Section */}
       <section className="pb-16 md:pb-24">
         <div className="container mx-auto px-4">
-          {!gameFinished ? (
+          {loading ? (
+            <div className="text-center py-20 italic">Đang tải câu hỏi...</div>
+          ) : !quiz || quizQuestions.length === 0 ? (
+            <div className="max-w-md mx-auto text-center py-20 border-2 border-dashed rounded-2xl bg-muted/20">
+              <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+              <p className="text-muted-foreground">Chưa có bộ câu hỏi nào được kích hoạt.</p>
+            </div>
+          ) : !gameFinished ? (
             <div className="max-w-2xl mx-auto">
               {/* Progress Card */}
               <div className="bg-card rounded-xl p-5 shadow-sm mb-6">

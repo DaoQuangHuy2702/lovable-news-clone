@@ -52,8 +52,16 @@ interface Article {
     } | null;
     views: number;
     createdAt: string;
-    type: "NEWS" | "ACTIVITY";
+    type: "NEWS" | "ACTIVITY" | "POLITICAL" | "LAW" | "DOCUMENT";
 }
+
+const articleTypeMap: Record<string, { label: string; className: string }> = {
+    NEWS: { label: "Tin tức", className: "" },
+    ACTIVITY: { label: "Hoạt động", className: "bg-blue-50 text-blue-700 border-blue-200" },
+    POLITICAL: { label: "Thông báo chính trị", className: "bg-red-50 text-red-700 border-red-200" },
+    LAW: { label: "Tìm hiểu luật", className: "bg-purple-50 text-purple-700 border-purple-200" },
+    DOCUMENT: { label: "Văn bản quy định", className: "bg-orange-50 text-orange-700 border-orange-200" },
+};
 
 const ArticleList = () => {
     const [articles, setArticles] = useState<Article[]>([]);
@@ -180,8 +188,11 @@ const ArticleList = () => {
                                         {article.title}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant={article.type === "NEWS" ? "secondary" : "outline"} className={article.type === "ACTIVITY" ? "bg-blue-50 text-blue-700 border-blue-200" : ""}>
-                                            {article.type === "NEWS" ? "Tin tức" : "Hoạt động"}
+                                        <Badge
+                                            variant={article.type === "NEWS" ? "secondary" : "outline"}
+                                            className={articleTypeMap[article.type]?.className || ""}
+                                        >
+                                            {articleTypeMap[article.type]?.label || article.type}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
